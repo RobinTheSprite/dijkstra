@@ -19,13 +19,13 @@ vector<int> getShortestPaths(const Graph& graph, int startingVertex)
     //Set initial distances and starting point
     for (auto i = 0ul; i < openSet.size(); ++i)
     {
-        if (i != startingVertex)
+        if (i == startingVertex)
         {
-            openSet[i] = {i, std::numeric_limits<int>::max()};
+            openSet[i] = {i, 0};
         }
         else
         {
-            openSet[i] = {i, 0};
+            openSet[i] = {i, std::numeric_limits<int>::max()};
         }
     }
 
