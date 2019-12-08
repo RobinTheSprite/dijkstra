@@ -16,6 +16,7 @@ vector<int> getShortestPaths(const Graph& graph, int startingVertex)
     vector<Vertex> openSet(graph.adjList.size());
     vector<int> closedSet(graph.adjList.size(), -1);
 
+    //Set initial distances and starting point
     for (auto i = 0ul; i < openSet.size(); ++i)
     {
         if (i != startingVertex)
@@ -30,24 +31,27 @@ vector<int> getShortestPaths(const Graph& graph, int startingVertex)
 
     while (!openSet.empty())
     {
-        auto v = std::min_element(openSet.begin(), openSet.end(), [](auto a, auto b){return a.distance < b.distance;});
+        //Get minimum distance
+        auto currentVertex = std::min_element(openSet.begin(), openSet.end(), [](auto a, auto b){return a.distance < b.distance;});
 
-        if (closedSet[v->id] == -1)
+        //If vertex is not in the closed set, put it there
+        if (closedSet[currentVertex->id] == -1)
         {
-            closedSet[v->id] = v->distance;
+            closedSet[currentVertex->id] = currentVertex->distance;
         }
 
-        for (auto edge : graph.adjList[v->id])
+        //Adjust distances of adjacent nodes
+        for (auto edge : graph.adjList[currentVertex->id])
         {
             auto nextVertex = std::find_if(openSet.begin(), openSet.end(), [edge](auto a){return a.id == edge.dest;});
-            auto distanceFromCurrent = v->distance + edge.weight;
+            auto distanceFromCurrent = currentVertex->distance + edge.weight;
             if (distanceFromCurrent < nextVertex->distance)
             {
                 openSet[nextVertex - openSet.begin()].distance = distanceFromCurrent;
             }
         }
 
-        openSet.erase(v);
+        openSet.erase(currentVertex);
     }
 
     return closedSet;
