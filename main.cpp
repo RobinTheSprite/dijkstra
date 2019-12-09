@@ -1,10 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <set>
+#include <queue>
 #include <algorithm>
 #include "Graph.h"
 using std::vector;
-using std::set;
+using std::priority_queue;
 
 struct Vertex
 {
@@ -13,45 +13,45 @@ struct Vertex
 
 vector<int> getShortestPaths(const Graph& graph, int startingVertex)
 {
-    vector<Vertex> openSet(graph.adjList.size());
+    auto vertexGreater = [](auto a, auto b){return a.distance > b.distance;};
+    priority_queue<Vertex, vector<Vertex>, decltype(vertexGreater)> openSet(vertexGreater);
     vector<int> closedSet(graph.adjList.size(), -1);
 
     //Set initial distances and starting point
-    for (auto i = 0ul; i < openSet.size(); ++i)
+    for (auto i = 0ul; i < graph.adjList.size(); ++i)
     {
         if (i == startingVertex)
         {
-            openSet[i] = {i, 0};
+            openSet.push({i, 0});
         }
         else
         {
-            openSet[i] = {i, std::numeric_limits<int>::max()};
+            openSet.push({i, std::numeric_limits<int>::max()});
         }
     }
 
-    while (!openSet.empty())
+    size_t verticesLeft = closedSet.size();
+    size_t count = 0;
+    while (verticesLeft)
     {
+        count++;
         //Get minimum distance
-        auto currentVertex = std::min_element(openSet.begin(), openSet.end(), [](auto a, auto b){return a.distance < b.distance;});
+        auto currentVertex = openSet.top();
+        openSet.pop();
 
         //If vertex is not in the closed set, put it there
-        if (closedSet[currentVertex->id] == -1)
+        if (closedSet[currentVertex.id] == -1)
         {
-            closedSet[currentVertex->id] = currentVertex->distance;
+            closedSet[currentVertex.id] = currentVertex.distance;
+            --verticesLeft;
         }
 
         //Adjust distances of adjacent nodes
-        for (auto edge : graph.adjList[currentVertex->id])
+        for (auto edge : graph.adjList[currentVertex.id])
         {
-            auto nextVertex = std::find_if(openSet.begin(), openSet.end(), [edge](auto a){return a.id == edge.dest;});
-            auto distanceFromCurrent = currentVertex->distance + edge.weight;
-            if (distanceFromCurrent < nextVertex->distance)
-            {
-                openSet[nextVertex - openSet.begin()].distance = distanceFromCurrent;
-            }
+            auto distanceFromCurrent = currentVertex.distance + edge.weight;
+            openSet.push({edge.dest, distanceFromCurrent});
         }
-
-        openSet.erase(currentVertex);
     }
 
     return closedSet;

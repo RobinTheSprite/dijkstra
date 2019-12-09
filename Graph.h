@@ -10,7 +10,7 @@ using std::vector;
 
 // data structure to store graph edges
 struct Edge {
-    int src, dest, weight;
+    size_t src, dest, weight;
 };
 
 
@@ -20,7 +20,7 @@ class Graph
   private:
     struct Endpoint
     {
-        int dest, weight;
+        size_t dest, weight;
     };
   public:
     // construct a vector of vectors to represent an adjacency list
